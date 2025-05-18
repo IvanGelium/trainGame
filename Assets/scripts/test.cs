@@ -1,30 +1,36 @@
 using UnityEngine;
-using UnityEngine.InputSystem; 
+using UnityEngine.InputSystem;
 
 public class test : MonoBehaviour
 {
-    
     InputAction moveAction;
     InputAction jumpAction;
+    float speed = 250000f;
+    public Rigidbody rigidBody;
+    public bool IsGrounded = false;
+
+    bool IsGroundedCheck()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, 1f);
+    }
+
+    Vector3 Vector2ToVector3(Vector2 vector)
+    {
+        return new Vector3(vector.x * speed * Time.deltaTime, 0, vector.y * speed * Time.deltaTime);
+    }
 
     private void Start()
     {
-        
         moveAction = InputSystem.actions.FindAction("Move");
-        jumpAction = InputSystem.actions.FindAction("Jump");
+        IsGrounded = IsGroundedCheck();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        
-
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
-        transform.position = moveValue;
-
-
-        if (jumpAction.IsPressed())
-        {
-            Debug.Log("Jump");
-        }
+        Vector3 moveValueVector3 = Vector2ToVector3(moveValue);
+        rigidBody.AddForce(moveValueVector3);
     }
+
+    void Update() { }
 }
