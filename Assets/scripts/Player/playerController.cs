@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class test : MonoBehaviour
+public class playerController : MonoBehaviour
 {
     InputAction moveAction;
     InputAction jumpAction;
@@ -10,7 +11,12 @@ public class test : MonoBehaviour
     public Rigidbody rigidBody;
     public float initSpeed = 250000f;
     public float sprintAccelerarion = 2f;
+    public float initFallSpeed = 10000f;
+    public float fallAcceleration = 50000f;
     public float sphereCastRadius = 0.4f;
+    public float gravityScale = 1f;
+
+    private float fallSpeed;
 
     void OnDrawGizmos()
     {
@@ -35,10 +41,15 @@ public class test : MonoBehaviour
 
     void Fall()
     {
-        //Добавить G-ускорение
+        if (isGrounded)
+        {
+            fallSpeed = initFallSpeed;
+        }
         if (!isGrounded)
         {
-            rigidBody.AddForce(new Vector3(0, -5000f, 0));
+            fallSpeed -=
+                (initFallSpeed + fallAcceleration) * Time.fixedDeltaTime * -1f * gravityScale;
+            rigidBody.AddForce(Vector3.down * Math.Max(fallSpeed, -500000f));
         }
     }
 
@@ -61,7 +72,11 @@ public class test : MonoBehaviour
 
     Vector3 Vector2ToVector3(Vector2 vector, float speed)
     {
-        return new Vector3(vector.x * speed * Time.deltaTime, 0, vector.y * speed * Time.deltaTime);
+        return new Vector3(
+            vector.x * speed * Time.fixedDeltaTime,
+            0,
+            vector.y * speed * Time.fixedDeltaTime
+        );
     }
 
     private void Start()
